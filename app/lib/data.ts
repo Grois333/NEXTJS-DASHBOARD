@@ -9,7 +9,8 @@ import {
 } from './definitions';
 import { formatCurrency } from './utils';
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+// prepare: false is required for Supabase/Vercel poolers (PgBouncer); otherwise error 26000 (invalid prepared statement).
+const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require', prepare: false });
 
 export async function fetchRevenue() {
   try {
