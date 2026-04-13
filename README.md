@@ -1,5 +1,15 @@
-## Next.js App Router Course - Starter
+# Next.js App Router — Dashboard
 
-This is the starter template for the Next.js App Router Course. It contains the starting code for the dashboard application.
+Dashboard app from the [Next.js Learn](https://nextjs.org/learn) App Router course.
 
-For more information, see the [course curriculum](https://nextjs.org/learn) on the Next.js Website.
+## Live demo
+
+**Production (Vercel):** [nextjs-invoice-dashbaord.vercel.app](https://nextjs-invoice-dashbaord.vercel.app/)
+
+## Preview
+
+![Acme dashboard — home view with revenue chart and latest invoices](docs/dashboard-preview.png)
+
+## Learn more
+
+See the [course curriculum](https://nextjs.org/learn) on the Next.js site.
