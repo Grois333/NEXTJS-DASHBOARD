@@ -29,12 +29,20 @@ export const { auth, signIn, signOut } = NextAuth({
                 .object({ email: z.string().email(), password: z.string().min(6) })
                 .safeParse(credentials);
 
-            // If the credentials are valid, get the user from the database
             if (parsedCredentials.success) {
                 const { email, password } = parsedCredentials.data;
                 const user = await getUser(email);
-                const passwordsMatch = await bcrypt.compare(password, user.password);
-                if (passwordsMatch) return user;
+                if (!user) {
+                    console.log('Invalid credentials');
+                    return null;
+                }
+                const passwordsMatch = await bcrypt.compare(
+                    password,
+                    user.password,
+                );
+                if (passwordsMatch) {
+                    return user;
+                }
             }
 
             console.log('Invalid credentials');
