@@ -18,6 +18,8 @@ Dashboard app from the [Next.js Learn](https://nextjs.org/learn) App Router cour
 pnpm build && pnpm test:e2e
 ```
 
+**Optional — Playwright MCP in Cursor** (AI-driven browser; not CI): [`playwright-mcp/README.md`](playwright-mcp/README.md).
+
 ## Learn more
 
 See the [course curriculum](https://nextjs.org/learn) on the Next.js site.

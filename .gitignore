@@ -12,6 +12,9 @@
 /blob-report/
 /playwright/.cache/
 
+# Playwright MCP (Cursor) — local snapshots / logs from interactive sessions
+.playwright-mcp/
+
 # next.js
 /.next/
 /out/
