@@ -3,9 +3,11 @@
 - **`playwright.config.ts`** — browsers, mobile projects, `webServer`, reporters.
 - **Tests** live in **`../tests/e2e/`** (repo root).
 
-## Commands (from repo root)
+Run everything below from the **repository root** with **pnpm** so Playwright uses this project’s config and `node_modules/.bin` (typing bare `playwright test` can resolve a different install on your `PATH`).
 
-These are npm scripts in **`package.json`** — use them instead of running `playwright test` by hand:
+## Commands
+
+Scripts live in **`package.json`** — prefer them over invoking `playwright` directly:
 
 | Script | Command |
 | --- | --- |
