@@ -6,7 +6,7 @@ description: Produce test coverage
 Parameters:
 - Task: the task to perform
 - Seed file (optional): the seed file to use, defaults to `tests/e2e/seed.spec.ts`
-- Test plan file (optional): the test plan file to write, under `specs/` folder.
+- Test plan file (optional): the test plan file to write, under `playwright/specs/` folder.
 
 1. Call #playwright-test-planner subagent with prompt:
 

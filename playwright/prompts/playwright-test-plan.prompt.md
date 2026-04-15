@@ -8,4 +8,4 @@ Create a comprehensive test plan for the **Acme invoice dashboard** (Next.js Lea
 Focus on flows that make sense for regression tests; skip purely cosmetic checks unless critical.
 
 - Seed file: `tests/e2e/seed.spec.ts`
-- Test plan output: `specs/acme-dashboard.plan.md`
+- Test plan output: `playwright/specs/acme-dashboard.plan.md`

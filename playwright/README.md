@@ -15,6 +15,7 @@ Everything Playwright-related for this repo lives **under this folder**, except:
 | [`mcp/`](mcp/) | Docs for **browser** Playwright MCP (`@playwright/mcp`) |
 | [`agents/`](agents/) | Test **Agents** definitions (planner, generator, healer) |
 | [`prompts/`](prompts/) | Prompt templates for those agents |
+| [`specs/`](specs/) | Planner output — Markdown test plans (path is set in `prompts/playwright-test-plan.prompt.md`) |
 | [`CI.md`](CI.md) | GitHub Actions / secrets |
 | [`TEST-AGENTS.md`](TEST-AGENTS.md) | Planner → generator → healer workflow |
 
