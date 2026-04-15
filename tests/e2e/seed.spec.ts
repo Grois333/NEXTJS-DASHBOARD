@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
+import { loginToDashboardFromHome } from './helpers/login-to-dashboard';
 
 /**
  * Seed for Playwright Test Agents (planner / generator / healer).
@@ -15,16 +16,5 @@ test('seed', async ({ page }) => {
     return;
   }
 
-  await page.goto('/');
-  await page.getByRole('link', { name: /log in/i }).click();
-  await expect(page).toHaveURL(/\/login/);
-  await page.getByLabel('Email').fill(email);
-  await page.getByLabel('Password', { exact: true }).fill(password);
-
-  // Wait for navigation in parallel with submit — Mobile Safari can be slower to redirect
-  // after the server action; the default 5s expect often flakes there.
-  await Promise.all([
-    page.waitForURL(/\/dashboard/, { timeout: 20_000 }),
-    page.getByRole('button', { name: /log in/i }).click(),
-  ]);
+  await loginToDashboardFromHome(page);
 });

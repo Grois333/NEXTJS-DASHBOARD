@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { loginToDashboardFromHome } from './helpers/login-to-dashboard';
 
 /**
  * Covers plan §1 Navigation (N1–N5): `playwright/specs/acme-dashboard.plan.md`
@@ -19,13 +20,7 @@ test.describe('Navigation (side nav + shell)', () => {
       return;
     }
 
-    await page.goto('/');
-    await page.getByRole('link', { name: /log in/i }).click();
-    await expect(page).toHaveURL(/\/login/);
-    await page.getByLabel('Email').fill(email);
-    await page.getByLabel('Password', { exact: true }).fill(password);
-    await page.getByRole('button', { name: /log in/i }).click();
-    await expect(page).toHaveURL(/\/dashboard/);
+    await loginToDashboardFromHome(page);
   });
 
   test('N1: Home navigates to dashboard overview', async ({ page }) => {

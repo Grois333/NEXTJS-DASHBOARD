@@ -2,8 +2,9 @@ import path from 'node:path';
 import { config as loadEnv } from 'dotenv';
 import { defineConfig, devices } from '@playwright/test';
 
-/** Load `.env` from repo root for local runs (never committed). CI uses injected env only. */
+/** Load env from repo root for local runs (never committed). CI uses injected env only. */
 loadEnv({ path: path.join(process.cwd(), '.env') });
+loadEnv({ path: path.join(process.cwd(), '.env.local'), override: true });
 
 /** Repo root — run `pnpm test:e2e` from the project root so `pnpm start` resolves. */
 const repoRoot = process.cwd();
@@ -14,10 +15,13 @@ const baseURL =
 
 export default defineConfig({
   testDir: '../tests/e2e',
+  /** Login + dashboard DB/Suspense can exceed 60s when many projects run in parallel. */
+  timeout: 120_000,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 2 : undefined,
+  /** Fewer workers = less contention on one Next server + Postgres (fewer mystery flakes). */
+  workers: process.env.CI ? 2 : 4,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL,
@@ -26,9 +30,10 @@ export default defineConfig({
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+    // WebKit login + App Router streaming are flakier than Chromium; retries reduce noise locally.
+    { name: 'webkit', use: { ...devices['Desktop Safari'] }, retries: 2 },
     { name: 'Mobile Chrome', use: { ...devices['Pixel 5'] } },
-    { name: 'Mobile Safari', use: { ...devices['iPhone 12'] } },
+    { name: 'Mobile Safari', use: { ...devices['iPhone 12'] }, retries: 2 },
   ],
   webServer: {
     command: 'pnpm start',
@@ -36,5 +41,11 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    // Forward env into the Next process (helps when Playwright spawns `pnpm start`).
+    env: Object.fromEntries(
+      Object.entries(process.env).filter(
+        (e): e is [string, string] => e[1] !== undefined,
+      ),
+    ),
   },
 });

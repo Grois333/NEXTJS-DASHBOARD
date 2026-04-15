@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { loginToDashboardFromHome } from './helpers/login-to-dashboard';
 
 function requireE2eCredentials(): { email: string; password: string } {
   const email = process.env.E2E_USER_EMAIL?.trim();
@@ -13,19 +14,9 @@ function requireE2eCredentials(): { email: string; password: string } {
 
 test.describe('Login', () => {
   test('home → login form → dashboard', async ({ page }) => {
-    const { email, password } = requireE2eCredentials();
+    requireE2eCredentials();
 
-    await page.goto('/');
-    await page.getByRole('link', { name: /log in/i }).click();
-    await expect(page).toHaveURL(/\/login/);
-
-    await page.getByLabel('Email').fill(email);
-    await page.getByLabel('Password', { exact: true }).fill(password);
-
-    await Promise.all([
-      page.waitForURL(/\/dashboard/, { timeout: 20_000 }),
-      page.getByRole('button', { name: /log in/i }).click(),
-    ]);
+    await loginToDashboardFromHome(page);
     await expect(
       page.getByRole('heading', { name: /dashboard/i }),
     ).toBeVisible();
