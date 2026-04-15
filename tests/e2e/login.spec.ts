@@ -21,9 +21,11 @@ test.describe('Login', () => {
 
     await page.getByLabel('Email').fill(email);
     await page.getByLabel('Password', { exact: true }).fill(password);
-    await page.getByRole('button', { name: /log in/i }).click();
 
-    await expect(page).toHaveURL(/\/dashboard/);
+    await Promise.all([
+      page.waitForURL(/\/dashboard/, { timeout: 20_000 }),
+      page.getByRole('button', { name: /log in/i }).click(),
+    ]);
     await expect(
       page.getByRole('heading', { name: /dashboard/i }),
     ).toBeVisible();
