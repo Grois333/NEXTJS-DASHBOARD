@@ -1,13 +1,9 @@
+# Optional: manual setup for GitHub Copilot coding agent + Playwright (see playwright init-agents).
+# Runs only when you click "Run workflow" — not on every push (avoids noisy emails / failed builds without DB secrets).
 name: "Copilot Setup Steps"
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - .github/workflows/copilot-setup-steps.yml
-  pull_request:
-    paths:
-      - .github/workflows/copilot-setup-steps.yml
 
 jobs:
   copilot-setup-steps:
@@ -17,22 +13,26 @@ jobs:
       contents: read
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - uses: pnpm/action-setup@v4
-      with:
-        version: 10
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-        cache: pnpm
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: pnpm
 
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-    - name: Install Playwright Browsers
-      run: pnpm exec playwright install --with-deps
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps
 
-    - name: Build application
-      run: pnpm run build
+      # If you run this workflow manually, add POSTGRES_URL / AUTH_SECRET etc. as repo secrets and pass env here — same as Playwright CI.
+      - name: Build application
+        run: pnpm run build
+        env:
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
