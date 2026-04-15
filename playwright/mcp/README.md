@@ -23,14 +23,14 @@ Official docs: [Getting started — Playwright MCP](https://playwright.dev/docs/
 ## Install in Cursor
 
 1. **Project config (this repo)**  
-   The repo includes **`.cursor/mcp.json`** with the Playwright MCP server (`npx -y @playwright/mcp@latest`).  
-   Reload Cursor after pulling this branch so the server is picked up.
+   The repo root has **`.cursor/mcp.json`** (must stay at root for Cursor). **Canonical copy:** [`../ide/cursor-mcp.json`](../ide/cursor-mcp.json) — includes browser MCP + `playwright-test` for agents.  
+   Reload Cursor after changes.
 
 2. **If the server does not appear**  
    Manually: **Cursor Settings → MCP → Add new MCP server** → command type `npx @playwright/mcp@latest` (or paste the JSON from [`mcp-config.example.json`](mcp-config.example.json)).
 
 3. **Confirm**  
-   In MCP settings, **playwright** should show as connected. Node must be on your `PATH`.
+   In MCP settings, **`playwright-mcp`** should show as connected (that is the browser MCP server). Node must be on your `PATH`. For **Test Agents** (planner, etc.), enable **`playwright-test-agents`** instead — see **`../ide/README.md`**.
 
 There is **no separate `pnpm` script** required for normal use; the MCP client runs `npx` as configured.
 

@@ -10,15 +10,13 @@ Dashboard app from the [Next.js Learn](https://nextjs.org/learn) App Router cour
 
 ![Acme dashboard — home view with revenue chart and latest invoices](docs/dashboard-preview.png)
 
-## E2E tests
+## E2E tests (Playwright)
 
-**Playwright** — commands, env, and local tips: [`playwright/README.md`](playwright/README.md). **CI:** [`docs/playwright-ci.md`](docs/playwright-ci.md).
+See **[`playwright/README.md`](playwright/README.md)** — commands, env, CI, optional MCP, and Test Agents.
 
 ```bash
 pnpm build && pnpm test:e2e
 ```
-
-**Optional — Playwright MCP in Cursor** (AI-driven browser; not CI): [`playwright-mcp/README.md`](playwright-mcp/README.md).
 
 ## Learn more
 
