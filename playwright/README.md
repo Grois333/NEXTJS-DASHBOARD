@@ -20,3 +20,7 @@ Use **`pnpm test:e2e`** when you want the same breadth as CI. Use **`pnpm test:e
 ## Env
 
 Set **`E2E_USER_EMAIL`** and **`E2E_USER_PASSWORD`** in **`.env`** (gitignored) — same names as GitHub Actions secrets for CI.
+
+## Test Agents (planner / generator / healer)
+
+Optional **Playwright Test Agents** (AI-assisted plans and generated tests): [`docs/playwright-test-agents.md`](../docs/playwright-test-agents.md). Includes **`tests/e2e/seed.spec.ts`** for agent bootstrap (separate from **`login.spec.ts`**).
