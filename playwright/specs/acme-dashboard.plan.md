@@ -90,7 +90,7 @@ If the environment always has a single page, mark P1/P3 conditional on fixture v
 
 ## 6. Create invoice
 
-Form: **Choose customer** (`customerId`), **amount** (number > 0), **status** (radio `pending` | `paid`). Cancel → `/dashboard/invoices`. Submit → `createInvoice` → redirect to `/dashboard/invoices` (`app/lib/actions.ts`).
+Spec: `tests/e2e/create-invoice.spec.ts` (C1–C4). Form: **Choose customer** (`customerId`), **amount** (number > 0), **status** (radio `pending` | `paid`). Cancel → `/dashboard/invoices`. Submit → `createInvoice` → redirect to `/dashboard/invoices` (`app/lib/actions.ts`).
 
 | ID | Scenario | Steps | Expected |
 |----|-----------|-------|----------|
@@ -116,9 +116,9 @@ Optional: invalid amount (0 or negative) per schema.
 
 | ID | Scenario | Steps | Expected |
 |----|-----------|-------|----------|
-| X1 | Delete | `delete-invoice.spec.ts` — no create. C1 runs first once via `c1-create-invoice.spec.ts` + project `setup-c1` (single Chromium run seeds DB for all browsers). | Row gone after navigation; server action POST completes before assert. |
+| X1 | Delete | `delete-invoice.spec.ts` — deletes the **newest** list row (first row). C1 runs first via project `setup-invoice` (`grep` on `C1: happy path` in `create-invoice.spec.ts`); Chromium only; standalone X1 seeds if the list is empty. | Row gone after navigation; server action POST completes before assert. |
 
-Shared helpers: `tests/e2e/helpers/c1-invoice.ts`. Optional auth reuse: https://playwright.dev/docs/auth#basic-shared-account-in-all-tests (`playwright/.auth/` gitignored).
+Shared helpers: `tests/e2e/helpers/invoice-helpers.ts`. Optional auth reuse: https://playwright.dev/docs/auth#basic-shared-account-in-all-tests (`playwright/.auth/` gitignored).
 
 ---
 

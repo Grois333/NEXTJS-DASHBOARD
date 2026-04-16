@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { firstInvoiceRowExcludingC1Amount } from './helpers/c1-invoice';
+import { dataTable, secondInvoiceRow } from './helpers/invoice-helpers';
 import { loginToDashboardFromHome } from './helpers/login-to-dashboard';
 
 /**
@@ -9,6 +9,8 @@ import { loginToDashboardFromHome } from './helpers/login-to-dashboard';
  *
  * E2 re-opens the edit page after save to assert the amount persisted (list can look stale
  * from RSC/cache right after redirect).
+ *
+ * E1/E2 use the **second** list row: X1 deletes the newest row (`tbody tr` first).
  */
 test.describe('Edit invoice', () => {
   const streamed = { timeout: 120_000 };
@@ -38,13 +40,13 @@ test.describe('Edit invoice', () => {
   }) => {
     await openInvoiceList(page);
 
-    const firstRow = firstInvoiceRowExcludingC1Amount(page);
-    if ((await firstRow.count()) === 0) {
+    if ((await dataTable(page).locator('tbody tr').count()) < 2) {
       test.skip();
       return;
     }
 
-    const editLink = firstRow.locator('a[href$="/edit"]');
+    const targetRow = secondInvoiceRow(page);
+    const editLink = targetRow.locator('a[href$="/edit"]');
     const href = await editLink.getAttribute('href');
     const match = href?.match(/\/dashboard\/invoices\/([^/]+)\/edit/);
     expect(match?.[1]).toBeTruthy();
@@ -77,18 +79,18 @@ test.describe('Edit invoice', () => {
   }) => {
     await openInvoiceList(page);
 
-    const firstRow = firstInvoiceRowExcludingC1Amount(page);
-    if ((await firstRow.count()) === 0) {
+    if ((await dataTable(page).locator('tbody tr').count()) < 2) {
       test.skip();
       return;
     }
 
-    const editHref = await firstRow.locator('a[href$="/edit"]').getAttribute('href');
+    const targetRow = secondInvoiceRow(page);
+    const editHref = await targetRow.locator('a[href$="/edit"]').getAttribute('href');
     const idMatch = editHref?.match(/\/dashboard\/invoices\/([^/]+)\/edit/);
     expect(idMatch?.[1]).toBeTruthy();
     const invoiceId = idMatch![1];
 
-    await firstRow.locator('a[href$="/edit"]').click();
+    await targetRow.locator('a[href$="/edit"]').click();
 
     const newDollars = 442.17;
     const amountStr = String(newDollars);

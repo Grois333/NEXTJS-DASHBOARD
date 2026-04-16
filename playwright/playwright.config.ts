@@ -28,35 +28,51 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   /**
-   * `c1-create-invoice.spec.ts` (plan §6 C1) runs in **chromium** only; other projects ignore it
-   * to avoid five parallel logins on the same account (NextAuth can stick on `/login`).
-   * `delete-invoice.spec.ts` (X1) creates its own C1 row per run so parallel browser projects
-   * do not fight over one shared invoice.
+   * `setup-invoice` runs only `C1: happy path…` from `create-invoice.spec.ts` so the DB has the
+   * newest row for `delete-invoice.spec.ts` (Chromium). Other projects `grepInvert` C1 so C1 is not duplicated.
+   * X1 runs Chromium only; other browsers ignore delete to avoid parallel fights over one row.
    */
   projects: [
     {
+      name: 'setup-invoice',
+      testMatch: '**/create-invoice.spec.ts',
+      grep: /C1: happy path/,
+      use: { ...devices['Desktop Chrome'] },
+      retries: process.env.CI ? 2 : 1,
+    },
+    {
       name: 'chromium',
+      dependencies: ['setup-invoice'],
+      grepInvert: /C1: happy path/,
       use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'firefox',
-      testIgnore: '**/c1-create-invoice.spec.ts',
+      dependencies: ['setup-invoice'],
+      grepInvert: /C1: happy path/,
+      testIgnore: '**/delete-invoice.spec.ts',
       use: { ...devices['Desktop Firefox'] },
     },
     {
       name: 'webkit',
-      testIgnore: '**/c1-create-invoice.spec.ts',
+      dependencies: ['setup-invoice'],
+      grepInvert: /C1: happy path/,
+      testIgnore: '**/delete-invoice.spec.ts',
       use: { ...devices['Desktop Safari'] },
       retries: 2,
     },
     {
       name: 'Mobile Chrome',
-      testIgnore: '**/c1-create-invoice.spec.ts',
+      dependencies: ['setup-invoice'],
+      grepInvert: /C1: happy path/,
+      testIgnore: '**/delete-invoice.spec.ts',
       use: { ...devices['Pixel 5'] },
     },
     {
       name: 'Mobile Safari',
-      testIgnore: '**/c1-create-invoice.spec.ts',
+      dependencies: ['setup-invoice'],
+      grepInvert: /C1: happy path/,
+      testIgnore: '**/delete-invoice.spec.ts',
       use: { ...devices['iPhone 12'] },
       retries: 2,
     },

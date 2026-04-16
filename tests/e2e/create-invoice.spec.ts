@@ -1,11 +1,15 @@
 import { test, expect } from '@playwright/test';
+import {
+  createHappyPathInvoice,
+  openCreateInvoice,
+} from './helpers/invoice-helpers';
 import { loginToDashboardFromHome } from './helpers/login-to-dashboard';
-import { openCreateInvoice } from './helpers/c1-invoice';
 
 /**
- * Plan §6 Create invoice (C2–C4): `playwright/specs/acme-dashboard.plan.md`
+ * Plan §6 Create invoice (C1–C4): `playwright/specs/acme-dashboard.plan.md`
  *
- * C1 lives in `c1-create-invoice.spec.ts` (chromium project only).
+ * C1 runs once in Playwright project `setup-invoice` (`grep: /C1: happy path/`) before other projects;
+ * Chromium repeats C2–C4 only (`grepInvert` on C1).
  */
 test.describe('Create invoice', () => {
   const streamed = { timeout: 120_000 };
@@ -20,6 +24,10 @@ test.describe('Create invoice', () => {
 
     await page.setViewportSize({ width: 1280, height: 720 });
     await loginToDashboardFromHome(page);
+  });
+
+  test('C1: happy path creates invoice and returns to list', async ({ page }) => {
+    await createHappyPathInvoice(page, streamed);
   });
 
   test('C2: empty submit shows field validation; stays on create page', async ({
