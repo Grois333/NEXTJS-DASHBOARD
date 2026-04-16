@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { loginToDashboardFromHome } from './helpers/login-to-dashboard';
+import { waitForAuthJsSessionCleared } from './helpers/wait-for-auth-session-cleared';
 
 /**
  * Plan §10 Auth boundaries (A1–A3): `playwright/specs/acme-dashboard.plan.md`
@@ -68,6 +69,7 @@ test.describe('Auth boundaries', () => {
 
     await page.getByRole('button', { name: /sign out/i }).click();
     await expect(page).toHaveURL(/\/$/, { timeout: 30_000 });
+    await waitForAuthJsSessionCleared(page);
 
     await Promise.all([
       page.waitForURL(/\/login/, { timeout: 30_000 }),

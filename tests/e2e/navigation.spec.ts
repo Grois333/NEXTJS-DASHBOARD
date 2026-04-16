@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { loginToDashboardFromHome } from './helpers/login-to-dashboard';
+import { waitForAuthJsSessionCleared } from './helpers/wait-for-auth-session-cleared';
 
 /**
  * Covers plan §1 Navigation (N1–N5): `playwright/specs/acme-dashboard.plan.md`
@@ -63,8 +64,9 @@ test.describe('Navigation (side nav + shell)', () => {
   test('N5: Sign out clears session', async ({ page }) => {
     await page.getByRole('button', { name: /sign out/i }).click();
 
-    // Match `auth-boundaries` A3: `load` can flake on redirect (FF/WebKit); `commit` + URL wait is stable.
+    // Match A3: wait until Auth.js session cookie is gone (URL can be `/` before cookie clears on some engines), then `commit` + login URL.
     await expect(page).toHaveURL(/\/$/, { timeout: 30_000 });
+    await waitForAuthJsSessionCleared(page);
 
     await Promise.all([
       page.waitForURL(/\/login/, { timeout: 30_000 }),
