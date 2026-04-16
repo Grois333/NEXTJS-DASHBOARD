@@ -2,7 +2,7 @@
 
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 export default function Search({ placeholder }: { placeholder: string }) {
@@ -12,8 +12,11 @@ export default function Search({ placeholder }: { placeholder: string }) {
 
   const queryFromUrl = searchParams.get('query')?.toString() ?? '';
   const [value, setValue] = useState(queryFromUrl);
+  /** Avoid clobbering the input from URL while a debounced replace is still pending. */
+  const pendingFromTypingRef = useRef(false);
 
   useEffect(() => {
+    if (pendingFromTypingRef.current) return;
     setValue(queryFromUrl);
   }, [queryFromUrl]);
 
@@ -33,15 +36,18 @@ export default function Search({ placeholder }: { placeholder: string }) {
 
   const debouncedPush = useDebouncedCallback((term: string) => {
     pushQuery(term);
+    pendingFromTypingRef.current = false;
   }, 300);
 
   const onChange = (term: string) => {
     setValue(term);
+    pendingFromTypingRef.current = true;
     debouncedPush(term);
   };
 
   const clearSearch = () => {
     debouncedPush.cancel();
+    pendingFromTypingRef.current = false;
     setValue('');
     pushQuery('');
   };

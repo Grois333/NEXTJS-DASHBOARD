@@ -35,7 +35,8 @@ test.describe('Invoice search & URL state', () => {
   });
 
   function searchInput(page: Page) {
-    return page.getByPlaceholder('Search invoices...');
+    /** `#search` is unique; placeholder can match multiple if layout duplicates. */
+    return page.locator('#search');
   }
 
   test('S1: typing a match updates URL with query= and filters rows', async ({
@@ -85,7 +86,9 @@ test.describe('Invoice search & URL state', () => {
 
     await input.fill('evil');
     await expect(page).toHaveURL(/[?&]query=/, { timeout: 10_000 });
-    await expect(clearButton).toBeVisible();
+    await expect(input).toHaveValue('evil', { timeout: 5_000 });
+    /** Debounce (300ms) + React commit; avoids racing the clear control. */
+    await expect(clearButton).toBeVisible({ timeout: 10_000 });
 
     await clearButton.click();
 

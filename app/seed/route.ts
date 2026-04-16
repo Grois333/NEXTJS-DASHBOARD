@@ -39,8 +39,13 @@ async function seedInvoices() {
       customer_id UUID NOT NULL,
       amount INT NOT NULL,
       status VARCHAR(255) NOT NULL,
-      date DATE NOT NULL
+      date DATE NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW()
     );
+  `;
+  await sql`
+    ALTER TABLE invoices
+    ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
   `;
 
   const insertedInvoices = await Promise.all(

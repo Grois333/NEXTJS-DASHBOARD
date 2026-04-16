@@ -1,10 +1,11 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { loginToDashboardFromHome } from './helpers/login-to-dashboard';
+import { openCreateInvoice } from './helpers/c1-invoice';
 
 /**
- * Plan §6 Create invoice (C1–C3 + invalid amount): `playwright/specs/acme-dashboard.plan.md`
+ * Plan §6 Create invoice (C2–C4): `playwright/specs/acme-dashboard.plan.md`
  *
- * Form: `app/ui/invoices/create-form.tsx` · validation: `createInvoice` in `app/lib/actions.ts`
+ * C1 lives in `c1-create-invoice.spec.ts` (chromium project only).
  */
 test.describe('Create invoice', () => {
   const streamed = { timeout: 120_000 };
@@ -21,41 +22,10 @@ test.describe('Create invoice', () => {
     await loginToDashboardFromHome(page);
   });
 
-  async function openCreateInvoice(page: Page) {
-    await page.goto('/dashboard/invoices/create');
-    await expect(page.getByLabel('Choose customer')).toBeVisible({
-      timeout: streamed.timeout,
-    });
-  }
-
-  test('C1: happy path creates invoice and returns to list', async ({ page }) => {
-    await openCreateInvoice(page);
-
-    const uniqueDollars = 777.77;
-    const formatted = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(uniqueDollars);
-
-    await page.getByLabel('Choose customer').selectOption({ label: 'Evil Rabbit' });
-    await page.getByLabel('Choose an amount').fill(String(uniqueDollars));
-    await page.getByRole('radio', { name: /^pending$/i }).check();
-
-    await page.getByRole('button', { name: 'Create Invoice' }).click();
-
-    await expect(page).toHaveURL(/\/dashboard\/invoices$/, { timeout: 30_000 });
-    await expect(
-      page.getByRole('columnheader', { name: 'Customer' }),
-    ).toBeVisible(streamed);
-
-    await expect(page.getByRole('table')).toContainText(formatted);
-    await expect(page.getByRole('table')).toContainText('Evil Rabbit');
-  });
-
   test('C2: empty submit shows field validation; stays on create page', async ({
     page,
   }) => {
-    await openCreateInvoice(page);
+    await openCreateInvoice(page, streamed.timeout);
 
     await page.getByRole('button', { name: 'Create Invoice' }).click();
 
@@ -71,7 +41,7 @@ test.describe('Create invoice', () => {
   });
 
   test('C3: Cancel navigates to invoice list without creating', async ({ page }) => {
-    await openCreateInvoice(page);
+    await openCreateInvoice(page, streamed.timeout);
 
     await page.getByRole('link', { name: 'Cancel' }).click();
 
@@ -84,7 +54,7 @@ test.describe('Create invoice', () => {
   test('C4: zero or negative amount shows validation; stays on create page', async ({
     page,
   }) => {
-    await openCreateInvoice(page);
+    await openCreateInvoice(page, streamed.timeout);
 
     await page.getByLabel('Choose customer').selectOption({ label: 'Evil Rabbit' });
     await page.getByRole('radio', { name: /^pending$/i }).check();

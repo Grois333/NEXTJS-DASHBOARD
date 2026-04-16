@@ -27,13 +27,39 @@ export default defineConfig({
     baseURL,
     trace: 'on-first-retry',
   },
+  /**
+   * `c1-create-invoice.spec.ts` (plan §6 C1) runs in **chromium** only; other projects ignore it
+   * to avoid five parallel logins on the same account (NextAuth can stick on `/login`).
+   * `delete-invoice.spec.ts` (X1) creates its own C1 row per run so parallel browser projects
+   * do not fight over one shared invoice.
+   */
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-    // WebKit login + App Router streaming are flakier than Chromium; retries reduce noise locally.
-    { name: 'webkit', use: { ...devices['Desktop Safari'] }, retries: 2 },
-    { name: 'Mobile Chrome', use: { ...devices['Pixel 5'] } },
-    { name: 'Mobile Safari', use: { ...devices['iPhone 12'] }, retries: 2 },
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'firefox',
+      testIgnore: '**/c1-create-invoice.spec.ts',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      testIgnore: '**/c1-create-invoice.spec.ts',
+      use: { ...devices['Desktop Safari'] },
+      retries: 2,
+    },
+    {
+      name: 'Mobile Chrome',
+      testIgnore: '**/c1-create-invoice.spec.ts',
+      use: { ...devices['Pixel 5'] },
+    },
+    {
+      name: 'Mobile Safari',
+      testIgnore: '**/c1-create-invoice.spec.ts',
+      use: { ...devices['iPhone 12'] },
+      retries: 2,
+    },
   ],
   webServer: {
     command: 'pnpm start',

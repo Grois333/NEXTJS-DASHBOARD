@@ -116,9 +116,9 @@ Optional: invalid amount (0 or negative) per schema.
 
 | ID | Scenario | Steps | Expected |
 |----|-----------|-------|----------|
-| X1 | Delete | Click delete on a disposable test invoice (create in same test or use dedicated fixture id). | Row disappears after reload or list refresh; `DELETE` + `revalidatePath` path works. |
+| X1 | Delete | `delete-invoice.spec.ts` — no create. C1 runs first once via `c1-create-invoice.spec.ts` + project `setup-c1` (single Chromium run seeds DB for all browsers). | Row gone after navigation; server action POST completes before assert. |
 
-Use an invoice created in-test or a CI-only seed id to avoid destroying shared fixtures.
+Shared helpers: `tests/e2e/helpers/c1-invoice.ts`. Optional auth reuse: https://playwright.dev/docs/auth#basic-shared-account-in-all-tests (`playwright/.auth/` gitignored).
 
 ---
 

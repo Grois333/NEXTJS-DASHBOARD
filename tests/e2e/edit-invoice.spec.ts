@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { firstInvoiceRowExcludingC1Amount } from './helpers/c1-invoice';
 import { loginToDashboardFromHome } from './helpers/login-to-dashboard';
 
 /**
@@ -37,7 +38,7 @@ test.describe('Edit invoice', () => {
   }) => {
     await openInvoiceList(page);
 
-    const firstRow = page.locator('table tbody tr').first();
+    const firstRow = firstInvoiceRowExcludingC1Amount(page);
     if ((await firstRow.count()) === 0) {
       test.skip();
       return;
@@ -76,7 +77,7 @@ test.describe('Edit invoice', () => {
   }) => {
     await openInvoiceList(page);
 
-    const firstRow = page.locator('table tbody tr').first();
+    const firstRow = firstInvoiceRowExcludingC1Amount(page);
     if ((await firstRow.count()) === 0) {
       test.skip();
       return;
