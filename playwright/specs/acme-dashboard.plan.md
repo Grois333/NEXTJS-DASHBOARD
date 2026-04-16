@@ -132,7 +132,7 @@ Shared helpers: `tests/e2e/helpers/invoice-helpers.ts`. Optional auth reuse: htt
 
 ## 10. Auth boundaries
 
-Align with `auth.config.ts` callbacks and `proxy.ts` matcher (non-static routes protected).
+Spec: `tests/e2e/auth-boundaries.spec.ts`. Align with `auth.config.ts` callbacks and `proxy.ts` matcher (non-static routes protected).
 
 | ID | Scenario | Steps | Expected |
 |----|-----------|-------|----------|
