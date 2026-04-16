@@ -21,10 +21,16 @@ const sql = postgres(process.env.POSTGRES_URL!, {
 let invoicesCreatedAtReady: Promise<void> | undefined;
 function ensureInvoicesCreatedAtColumn() {
   invoicesCreatedAtReady ??= (async () => {
-    await sql`
-      ALTER TABLE invoices
-      ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW()
-    `;
+    try {
+      await sql`
+        ALTER TABLE invoices
+        ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW()
+      `;
+    } catch (e) {
+      // Rejected promises are truthy — clear so the next call can retry after DB recovery.
+      invoicesCreatedAtReady = undefined;
+      throw e;
+    }
   })();
   return invoicesCreatedAtReady;
 }

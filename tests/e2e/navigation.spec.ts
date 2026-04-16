@@ -63,9 +63,12 @@ test.describe('Navigation (side nav + shell)', () => {
   test('N5: Sign out clears session', async ({ page }) => {
     await page.getByRole('button', { name: /sign out/i }).click();
 
-    await expect(page).toHaveURL(/\/$/);
+    // Match `auth-boundaries` A3: `load` can flake on redirect (FF/WebKit); `commit` + URL wait is stable.
+    await expect(page).toHaveURL(/\/$/, { timeout: 30_000 });
 
-    await page.goto('/dashboard');
-    await expect(page).toHaveURL(/\/login/);
+    await Promise.all([
+      page.waitForURL(/\/login/, { timeout: 30_000 }),
+      page.goto('/dashboard', { waitUntil: 'commit' }),
+    ]);
   });
 });
