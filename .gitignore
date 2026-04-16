@@ -8,6 +8,8 @@
 # testing
 /coverage
 /playwright-report/
+# Auth storageState files (see https://playwright.dev/docs/auth)
+/playwright/.auth/
 /test-results/
 /blob-report/
 /playwright/.cache/

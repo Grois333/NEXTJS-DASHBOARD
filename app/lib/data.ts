@@ -10,7 +10,30 @@ import {
 import { formatCurrency } from './utils';
 
 // prepare: false is required for Supabase/Vercel poolers (PgBouncer); otherwise error 26000 (invalid prepared statement).
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require', prepare: false });
+const sql = postgres(process.env.POSTGRES_URL!, {
+  ssl: 'require',
+  prepare: false,
+  /** Avoid hanging E2E / SSR when the DB is unreachable (default is no limit). */
+  connect_timeout: 30,
+});
+
+/** Older DBs may lack `created_at`; migrate once so list ordering does not error before `/seed` is run. */
+let invoicesCreatedAtReady: Promise<void> | undefined;
+function ensureInvoicesCreatedAtColumn() {
+  invoicesCreatedAtReady ??= (async () => {
+    try {
+      await sql`
+        ALTER TABLE invoices
+        ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW()
+      `;
+    } catch (e) {
+      // Rejected promises are truthy — clear so the next call can retry after DB recovery.
+      invoicesCreatedAtReady = undefined;
+      throw e;
+    }
+  })();
+  return invoicesCreatedAtReady;
+}
 
 export async function fetchRevenue() {
   try {
@@ -33,11 +56,12 @@ export async function fetchRevenue() {
 
 export async function fetchLatestInvoices() {
   try {
+    await ensureInvoicesCreatedAtColumn();
     const data = await sql<LatestInvoiceRaw[]>`
       SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
       FROM invoices
       JOIN customers ON invoices.customer_id = customers.id
-      ORDER BY invoices.date DESC
+      ORDER BY invoices.date DESC, invoices.created_at DESC
       LIMIT 5`;
 
     const latestInvoices = data.map((invoice) => ({
@@ -94,6 +118,7 @@ export async function fetchFilteredInvoices(
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
+    await ensureInvoicesCreatedAtColumn();
     const invoices = await sql<InvoicesTable[]>`
       SELECT
         invoices.id,
@@ -111,7 +136,7 @@ export async function fetchFilteredInvoices(
         invoices.amount::text ILIKE ${`%${query}%`} OR
         invoices.date::text ILIKE ${`%${query}%`} OR
         invoices.status ILIKE ${`%${query}%`}
-      ORDER BY invoices.date DESC
+      ORDER BY invoices.date DESC, invoices.created_at DESC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
     `;
 

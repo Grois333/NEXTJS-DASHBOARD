@@ -1,0 +1,1 @@
+Playwright agent definitions and prompts live under **`playwright/agents/`** and **`playwright/prompts/`** (see **`playwright/TEST-AGENTS.md`**). `pnpm exec playwright init-agents` may recreate paths here — merge into **`playwright/`** if needed.
